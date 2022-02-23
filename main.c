@@ -4,123 +4,123 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-struct Dugum{
+struct Node{
     int count;
     char data[100];
-    struct Dugum *sonraki;
+    struct Node *next;
 };
 
-void printList(struct Dugum *n){
+void printList(struct Node *n){
         while(n!=NULL){
             printf("%s : %d\n",n->data,n->count);
-            n=n->sonraki;
+            n=n->next;
         }
 
 }
 
 
-bool varMi(struct Dugum *n,char *world){
+bool varMi(struct Node *n,char *world){
     while(n!=NULL){
         int sonuc = strcasecmp(n->data,world);
         if(sonuc == 0)
             return true;
-        n=n->sonraki;
+        n=n->next;
     }
     return false;
 
 
 }
 
-void sonaEkle(struct Dugum **kokdugum ,int newCount,char *newData){
-        struct Dugum *yeni_dugum = (struct Dugum*)malloc(sizeof(struct Dugum));
-        struct Dugum *kokdugumSonuncu=*kokdugum;
-        yeni_dugum->count=newCount;
+void sonaEkle(struct Node **kokdugum ,int newCount,char *newData){
+        struct Node *new_node = (struct Node*)malloc(sizeof(struct Node));
+        struct Node *kokdugumSonuncu=*kokdugum;
+        new_node->count=newCount;
 
-        strcpy(yeni_dugum->data,newData);
-        yeni_dugum->sonraki=NULL;
+        strcpy(new_node->data,newData);
+        new_node->next=NULL;
             if(*kokdugum==NULL)
             {
-                *kokdugum=yeni_dugum;
+                *kokdugum=new_node;
                 return;
             }
 
-            while(kokdugumSonuncu->sonraki!=NULL)
+            while(kokdugumSonuncu->next!=NULL)
                 {
 
-                        kokdugumSonuncu=kokdugumSonuncu->sonraki;
+                        kokdugumSonuncu=kokdugumSonuncu->next;
                 }
-             kokdugumSonuncu->sonraki=yeni_dugum;
+             kokdugumSonuncu->next=new_node;
 
 }
-void basaEkle(struct Dugum **kokdugum,int newCount,char *newData){
-        struct Dugum *yeni_dugum=(struct Dugum*)malloc(sizeof(struct Dugum));
+void basaEkle(struct Node **kokdugum,int newCount,char *newData){
+        struct Node *new_node=(struct Node*)malloc(sizeof(struct Node));
 
-        yeni_dugum->count=newCount;
-        strcpy(yeni_dugum->data,newData);
-        yeni_dugum->sonraki=(*kokdugum);
-        (*kokdugum)=yeni_dugum;
+        new_node->count=newCount;
+        strcpy(new_node->data,newData);
+        new_node->next=(*kokdugum);
+        (*kokdugum)=new_node;
 
 }
 
-void arayaEkle(struct Dugum **kokdugum,int newCount , char *newData){
-            struct Dugum *yeni_dugum =(struct Dugum*)malloc(sizeof(struct Dugum));
-            struct Dugum *kokGez=*kokdugum;
-            yeni_dugum->count=newCount;
-            strcpy(yeni_dugum->data,newData);
+void arayaEkle(struct Node **kokdugum,int newCount , char *newData){
+            struct Node *new_node =(struct Node*)malloc(sizeof(struct Node));
+            struct Node *kokGez=*kokdugum;
+            new_node->count=newCount;
+            strcpy(new_node->data,newData);
 
-                while(kokGez->sonraki!=NULL)
+                while(kokGez->next!=NULL)
                 {
-                    if(kokGez->sonraki->count<=newCount){
-                            yeni_dugum->sonraki=kokGez->sonraki;
-                            kokGez->sonraki=yeni_dugum;
+                    if(kokGez->next->count<=newCount){
+                            new_node->next=kokGez->next;
+                            kokGez->next=new_node;
                             return;
                     }
-                    kokGez=kokGez->sonraki;
+                    kokGez=kokGez->next;
                 }
 }
 
 
 int main(){
-    struct Dugum* yeni = NULL;
-    char kelime[100];
-    char kelime2[100];
+    struct Node* yeni = NULL;
+    char word[100];
+    char word2[100];
     int maxAdet=1;
     int minAdet=1;
     FILE * dosya = fopen("prolab3.txt","r");
     if(dosya==NULL)
     {
-        printf("dosya yok...");
+        printf("File not found...");
         exit(1);
     }
-    while(fscanf(dosya,"%99s",kelime) != EOF)
+    while(fscanf(dosya,"%99s",word) != EOF)
     {
         int adet = 1;
         int i=0;
-        while(kelime[i] != '\0')
+        while(word[i] != '\0')
             i++;
         int gosterge = ftell(dosya);
         fseek(dosya,gosterge,SEEK_SET);
-        if(varMi(yeni,kelime))
+        if(varMi(yeni,word))
             continue;
-        while(fscanf(dosya,"%99s",kelime2) != EOF)
+        while(fscanf(dosya,"%99s",word2) != EOF)
         {
             int j=0;
-            while(kelime2[j] != '\0')
+            while(word2[j] != '\0')
                 j++;
-            int sonuc = strcasecmp(kelime,kelime2);
+            int sonuc = strcasecmp(word,word2);
             if (sonuc == 0)
                 adet++;
         }
         if(adet>=maxAdet){
-            basaEkle(&yeni,adet,&kelime);
+            basaEkle(&yeni,adet,&word);
             maxAdet=adet;
         }
         else if(adet<=minAdet){
-            sonaEkle(&yeni,adet,&kelime);
+            sonaEkle(&yeni,adet,&word);
             minAdet=adet;
         }
         else{
-           arayaEkle(&yeni,(adet),&kelime);
+           arayaEkle(&yeni,(adet),&word);
         }
 
         fseek(dosya,gosterge,SEEK_SET);
